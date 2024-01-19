@@ -1,5 +1,6 @@
-import Link from "../node_modules/next/link";
+import Link from "next/link";
 // import styles from "./page.module.css";
+import { getServerSession } from "next-auth";
 
 type Repository = {
   id: number;
@@ -31,12 +32,23 @@ async function getRepo(): Promise<Repository> {
 }
 
 export default async function Page() {
+  const session = await getServerSession();
   const [data, time] = await Promise.all([getRepo(), getTime()]);
   return (
-    <div>
-      <h1>{data.full_name}</h1>
-      <p>Updated at: {time.datetime}</p>
-      <Link href="/about">About</Link>
-    </div>
+    <>
+      getServerSession result{" "}
+      {session?.user?.name ? (
+        <div>
+          {session?.user?.name}
+          <div>
+            <h1>{data.full_name}</h1>
+            <p>Updated at: {time.datetime}</p>
+            <Link href="/about">About</Link>
+          </div>
+        </div>
+      ) : (
+        <div>Not logged in</div>
+      )}
+    </>
   );
 }
